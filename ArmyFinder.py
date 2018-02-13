@@ -2,50 +2,53 @@
 from PttArmyRadar import Model
 from faker import Faker
 from collections import Counter
+import random
 
 class ArmyFinder:
+    def __init__(self,PushList):
+        self.PushList = PushList
 
     # 輸入List<PushInfo> 移除重覆帳號，找出重覆的IP
-    def FindDuplicateIP(self,PushList):
-        # 移除重覆帳號
+    def FindDuplicateIP(self,UserList):
 
-
-        a = Counter(tok.ip for tok in PushList)
+        a = Counter(tok.ip for tok in self.PushList)
         print(a)
 
-    # 將推文list中 移除重覆帳號 ip為空的帳號補上IP
-    def FillIpInPushList(self,PushList):
+    # 移除推文list中的重覆帳號 回傳list [(userid,ip),...]
+    def RemoveDuplicateUserId(self):
         # 移除重覆帳號
-        accounts = set([info.userid for info in PushList])
-        print(accounts)
+        return list(dict((x.userid, x.ip) for x in sorted(self.PushList, key=lambda v: len(v.content))).items())
+
+    # 如果ip是空的 補上去
+    def FillIpInUserList(self):
+        pass
+
 
 
 # 產生假資料
 def FakeData(number):
     PushList = []
     fake = Faker('zh_TW')
-    iplist = ['127.0.0.1','61.65.18.65','98.321.12.221','140.112.1.9','120.36.15.60','210.160.99.3','118.336.12.1',
-              '123.964.123.41','140.116.12.1','140.118.123.2','140.119.68.1','140.117.3.1','212.123.12.10','210.127.51.1',
-              '135.651.123.13','128.98.36.1','123.68.54.1','21.56.1.5','216.369.25.1','212.254.52.1','215.59.11.1','220.598.14.1'
-              ]
-    accountList = ['john','amy','lia','julia','asuka','roy','joe','ben']
+    accountList = [('john','127.0.0.1'),('amy','61.65.18.65'),('lia','98.321.12.221'),('julia','140.112.1.9'),
+                   ('asuka','120.36.15.60'),('roy','210.160.99.3'),('vi000246',None),('ben','123.964.123.41')]
     for i in range(0,number):
+        user = random.choice(accountList)
         PushList.append(Model.PushInfo(fake.word(ext_word_list=['推','噓','→']),
                                        # fake.user_name(),
-                                       fake.word(ext_word_list=accountList),
+                                       user[0],
                                        fake.text(max_nb_chars=20, ext_word_list=None),
                                        fake.date(pattern="%Y-%m-%d", end_datetime=None),
                                        # fake.ipv4(network=False)
-                                       fake.word(ext_word_list=iplist)
+                                       user[1]
                                        ))
     
     return PushList
 
 if __name__ == '__main__':
     FakeData = FakeData(300)
-    finder = ArmyFinder()
-    # finder.FindDuplicateIP(FakeData)
-    finder.FillIpInPushList(FakeData)
+    finder = ArmyFinder(FakeData)
+    # finder.FindDuplicateIP()
+    finder.FillIpInPushList()
 
     # for i in FakeData:
     #     print(i.tag,i.userid,i.content,i.time,i.ip)

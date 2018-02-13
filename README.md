@@ -10,6 +10,7 @@ PTT網軍、業配文查詢器
 * 將帳號密碼改用使用者輸入 並且可以記憶
 * 製作GUI
 * 同帳號重覆推文的處理邏輯
+* 支援多篇文章一起搜尋
 
 requirement:
 * pip install PTTLibrary
