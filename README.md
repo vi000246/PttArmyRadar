@@ -7,3 +7,10 @@ PTT網軍、業配文查詢器
 * 取得作者資訊
 * 取得作者在其他板的發文
 * 取得最多的重覆IP在其他板的發文
+* 將帳號密碼改用使用者輸入 並且可以記憶
+* 製作GUI
+* 同帳號重覆推文的處理邏輯
+
+requirement:
+* pip install PTTLibrary
+* pip install Faker
