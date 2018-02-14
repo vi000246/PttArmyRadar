@@ -11,7 +11,7 @@ class ArmyFinder:
         self.PushList = PushList # 完整推文訊息
         self.telnetServer = None # telnet的執行個體 防止重覆呼叫
 
-    # 移除推文list中的重覆資料(只有同帳號&同IP才移除)和作者帳號 回傳list [(userid,ip),...]
+    # 移除推文list中的重覆資料(只有同帳號&同IP才移除)和作者帳號 回傳list [PushInfo(...),...]
     def RemovePustListDuplicateDataAndAuthorId(self, authorid):
         self.PushList = [x for x in list(set(self.PushList)) if x.userid != authorid]
 
