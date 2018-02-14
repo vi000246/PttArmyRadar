@@ -43,7 +43,8 @@ class ArmyFinder:
     # 輸入[(userid,ip),...] 找出重覆的IP  (需要在GetUserIdSameAsAuthorIP之後呼叫)
     def FindDuplicateIP(self):
         countlist = Counter(tok[1] for tok in self.tupleList)
-        a = [(k,v) for k, v in countlist.items() if v > 1 ]
+        print(countlist)
+        a = [(k,v) for k, v in countlist.most_common() if v > 1 ]
         print("重覆的ip",a)
 
 
@@ -52,10 +53,10 @@ class ArmyFinder:
 def FakeData(number):
     PushList = []
     fake = Faker('zh_TW')
-    accountList = [('john','127.0.0.1'),('john','127.0.0.2'),('amy','61.65.18.65'),
-                   ('lia','98.321.12.221'),('julia','140.112.1.9'),
-                   ('asuka','120.36.15.60'),('roy','210.160.99.3'),('vi000246','123.964.123.41'),('ben','123.964.123.41'),
-                   ('yich','127.0.0.1'),('beef','127.0.0.1')]
+    accountList = [('john','127.0.0.1'),('john','127.0.0.1'),('amy','127.0.0.1'),
+                   ('lia','140.112.1.9'),('julia','140.112.1.9'),
+                   ('asuka','140.112.1.9'),('roy','140.112.1.9'),('vi000246','140.112.1.9'),('ben','123.964.123.41'),
+                   ('yich','127.0.0.1'),('beef','127.0.0.1'),('aloha','235.151.123.1'),('yamaha','235.151.123.1')]
     for i in range(0,number):
         user = random.choice(accountList)
         PushList.append(Model.PushInfo(fake.word(ext_word_list=['推','噓','→']),
@@ -74,7 +75,7 @@ if __name__ == '__main__':
     finder = ArmyFinder(FakeData)
     finder.RemovePustListDuplicateDataAndAuthorId('vi0002467')
     finder.FillIpInPushList()
-    print("和作者相同的帳號",finder.GetUserIdSameAsAuthorIP('127.0.0.1'))
+    print("和作者相同的帳號",finder.GetUserIdSameAsAuthorIP(''))
     finder.FindDuplicateIP()
 
     # print(finder.tupleList)
