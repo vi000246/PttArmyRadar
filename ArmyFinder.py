@@ -4,48 +4,50 @@ from faker import Faker
 from collections import Counter
 import random
 from PttArmyRadar import PTT
+from itertools import groupby
 
 class ArmyFinder:
     def __init__(self,PushList):
         self.PushList = PushList # 完整推文訊息
-        self.tupleList = [] # (userid,ip)的list
         self.telnetServer = None # telnet的執行個體 防止重覆呼叫
 
     # 移除推文list中的重覆資料(只有同帳號&同IP才移除)和作者帳號 回傳list [(userid,ip),...]
     def RemovePustListDuplicateDataAndAuthorId(self, authorid):
-        self.tupleList =  list(set([(x.userid, x.ip) for x in self.PushList if x.userid != authorid]))
+        self.PushList = [x for x in list(set(self.PushList)) if x.userid != authorid]
 
     # 如果ip是空的 補上去(先執行完RemoveDuplicateData再執行這步)
     def FillIpInPushList(self):
-        for obj in self.tupleList:
-            if not obj[1]:
+        for obj in self.PushList:
+            if not obj.ip:
                 if not self.telnetServer:
                     self.telnetServer = PTT.PTTParser()
 
-                ip = self.telnetServer.GetUserIP(obj[0])
-                self.update_in_tuplelist(obj[0],ip)
+                ip = self.telnetServer.GetUserIP(obj.userid)
+                obj.ip = ip
 
-    # 依據userid 更新tupleList的ip
-    def update_in_tuplelist(self,userid, ip):
-        self.tupleList =  [(k, v) if (k != userid) else (userid, ip) for (k, v) in self.tupleList]
-
-    # 找出tuplelist中 跟作者ip一樣的帳號 自tuplelist中刪除 並回傳符合的list
+    # 找出PushList中 跟作者ip一樣的帳號 自PushList中刪除 並回傳符合的list
     def GetUserIdSameAsAuthorIP(self,authorip):
         authoripList = []
-        for obj in self.tupleList.copy():
-            if obj[1] ==authorip:
-                i = self.tupleList.index(obj)
-                authoripList.append(self.tupleList.pop(i))
+        for obj in self.PushList.copy():
+            if obj.ip == authorip:
+                i = self.PushList.index(obj)
+                authoripList.append(self.PushList.pop(i))
 
         return authoripList
 
 
-    # 輸入[(userid,ip),...] 找出重覆的IP  (需要在GetUserIdSameAsAuthorIP之後呼叫)
-    def FindDuplicateIP(self):
-        countlist = Counter(tok[1] for tok in self.tupleList)
-        print(countlist)
-        a = [(k,v) for k, v in countlist.most_common() if v > 1 ]
-        print("重覆的ip",a)
+    # 輸入[PushInfo(),...] 找出重覆的IP  (需要在GetUserIdSameAsAuthorIP之後呼叫)
+    # 回傳格式[[(IP,出現次數),[PushInfo()...]],[....],...]
+    def GetDuplicateIP(self):
+        grouplist = []
+        for g, items in groupby(sorted(self.PushList), key=lambda a: a.ip):
+            listitems = list(items)
+            if len(listitems) > 1:
+                grouplist.append([(g,len(listitems)),listitems])
+
+        return grouplist
+
+
 
 
 
@@ -73,10 +75,10 @@ def FakeData(number):
 if __name__ == '__main__':
     FakeData = FakeData(300)
     finder = ArmyFinder(FakeData)
-    finder.RemovePustListDuplicateDataAndAuthorId('vi0002467')
+    finder.RemovePustListDuplicateDataAndAuthorId('john')
     finder.FillIpInPushList()
-    print("和作者相同的帳號",finder.GetUserIdSameAsAuthorIP(''))
-    finder.FindDuplicateIP()
+    print("和作者相同ip的帳號",finder.GetUserIdSameAsAuthorIP('140.112.1.9'))
+    print(finder.GetDuplicateIP())
 
     # print(finder.tupleList)
 

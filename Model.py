@@ -6,4 +6,15 @@ class PushInfo:
         self.content = content
         self.time = time
         self.ip = ip
+    def __eq__(self, other):
+      return self.userid == other.userid and self.ip==other.ip
+
+    def __hash__(self):
+      return hash(('userid', self.userid, 'ip', self.ip))
+
+    def __repr__(self):
+      return str(self.userid) + ' ' + str(self.ip)
+
+    def __lt__(self, other):
+        return self.ip < other.ip
 
