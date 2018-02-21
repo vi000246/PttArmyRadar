@@ -10,26 +10,24 @@ class PTTParser:
         if not self.PTTBot.isLoginSuccess():
             self.PTTBot.Log('登入失敗')
 
-
-    def GetUserIP(self,userid):
+    # 回傳使用者的(IP,登入次數,文章數)
+    def GetUserInfo(self,userid):
         ErrorCode, UserInfo = self.PTTBot.getUserInfo(userid)
-        ip = None
-
         if ErrorCode == self.PTTBot.NoUser:
             self.PTTBot.Log('No such user')
 
         if ErrorCode != self.PTTBot.Success:
             self.PTTBot.Log('getUserInfo fail error code: ' + str(ErrorCode))
+            return None,None,None
         else:
-            ip = UserInfo.getLastIP()
+            return UserInfo.getLastIP(),str(UserInfo.getLoginTime()),str(UserInfo.getPost())
 
-        return ip
 
 
 if __name__ == '__main__':
     a = PTTParser()
-    print(a.GetUserIP('vi000246'))
-    print(a.GetUserIP('digforapples'))
-    print(a.GetUserIP('F7'))
-    print(a.GetUserIP('you cant find this account'))
+    print(a.GetUserInfo('vi000246'))
+    print(a.GetUserInfo('digforapples'))
+    print(a.GetUserInfo('F7'))
+    print(a.GetUserInfo('you cant find this account'))
     a.PTTBot.logout()

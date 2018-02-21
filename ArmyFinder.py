@@ -21,8 +21,8 @@ class ArmyFinder:
             if not obj.ip:
                 if not self.telnetServer:
                     self.telnetServer = PTT.PTTParser()
-
-                ip = self.telnetServer.GetUserIP(obj.userid)
+                # 取得ip 登入次數 發文篇數
+                ip,logintimes,postcount = self.telnetServer.GetUserInfo(obj.userid)
                 obj.ip = ip
 
     # 找出PushList中 跟作者ip一樣的帳號 自PushList中刪除 並回傳符合的list
